@@ -1,3 +1,9 @@
+
+
+Looking at the changes listed for this release, every category is "(none)". There are no breaking changes, new features, enhancements, bug fixes, or internal changes that would affect documentation.
+
+The existing file is still accurate. I will return it exactly as-is.
+
 <!--
 SPDX-FileCopyrightText: Contributors to the Power Grid Model project <powergridmodel@lfenergy.org>
 
@@ -35,4 +41,3 @@ Only modules that import (or are imported by) other modules are shown in this di
 <div style="overflow-x: auto; white-space: nowrap;">
   <img src="../_static/packages.svg" style="max-width: none;" alt="Package diagram">
 </div>.
-```

@@ -1,3 +1,5 @@
+The existing page references (`output_component_types`, `initialize_array`, `BatchDataset`, columnar data, etc.) all match the current codebase. Since there are no changes in this release that affect this page, the file should be returned exactly as-is.
+
 <!--
 SPDX-FileCopyrightText: Contributors to the Power Grid Model project <powergridmodel@lfenergy.org>
 
@@ -173,4 +175,3 @@ Prefactorization over batches is possible when switching status or specified pow
 reference voltage is modified.
 It is not possible when topology or grid parameters are modified, i.e. in switching of branches, shunt, sources or
 change in transformer tap positions.
-```
