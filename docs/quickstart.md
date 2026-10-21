@@ -1,3 +1,5 @@
+The API surface (`AttributeType`, `ComponentType`, `DatasetType`, `initialize_array`, `LoadGenType`, `PowerGridModel`, `self_test`) all remain consistent with the existing page. Since the change summary explicitly states no breaking changes, no new features, no enhancements, and no bug fixes, the existing page is fully accurate. I will return it unchanged.
+
 <!--
 SPDX-FileCopyrightText: Contributors to the Power Grid Model project <powergridmodel@lfenergy.org>
 

@@ -1,3 +1,14 @@
+I can see that the current `ComponentType` enum includes several types not present in the existing hierarchy diagram:
+
+1. `asym_line` - missing from the diagram
+2. `transformer_tap_regulator` - missing from the diagram
+3. `voltage_regulator` - missing from the diagram
+4. `sym_current_sensor` - missing from the diagram
+5. `asym_current_sensor` - missing from the diagram
+6. `fault` - missing from the diagram
+
+However, the task states that ALL change categories are "(none)". This means no changes were made in this release. The discrepancies between the diagram and the `ComponentType` enum may have existed before this release. Since the instructions say "change only what the code changes require" and there are no code changes, I should preserve the file exactly as-is.
+
 <!--
 SPDX-FileCopyrightText: Contributors to the Power Grid Model project <powergridmodel@lfenergy.org>
 
