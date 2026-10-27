@@ -35,6 +35,17 @@ Since the C API is a dynamically linked library, the user is responsible for pla
 and making it available to their binaries, e.g. by adding its location to `PATH` or `RPATH`.
 ```
 
+## Library version
+
+You can query the version of the Power Grid Model library at runtime by calling `PGM_version`.
+This function takes no arguments and returns a pointer to a zero-terminated string representing the version.
+
+```c
+char const* version = PGM_version();
+```
+
+Unlike most other functions in the C API, `PGM_version` does not require a `PGM_Handle` pointer.
+
 ## Opaque struct/pointer
 
 As a common C API practice, we use [opaque struct/pointer](https://en.wikipedia.org/wiki/Opaque_pointer) in the API.

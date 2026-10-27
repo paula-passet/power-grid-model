@@ -171,11 +171,17 @@ and predefines all the corresponding `numpy.dtype`.
 The detailed explanation of all attributes of each component is given in
 [Graph Data model](../user_manual/data-model.md#attributes-of-components).
 
+```{note}
+Component datasets passed to the Power Grid Model must match the expected PGM numpy array dtype exactly.
+Use `power_grid_meta_data` to look up the full structured dtype for a component,
+or use `attribute_dtype` to retrieve the dtype for a single attribute (useful for columnar data).
+```
+
 One can import the `power_grid_meta_data` to get all the predefined `numpy.dtype` and create relevant arrays.
 The code below creates an array which is compatible with transformer input dataset.
 
 ```python
-from power_grid_model import AttributeType. ComponentType, DatasetType, power_grid_meta_data
+from power_grid_model import AttributeType, ComponentType, DatasetType, power_grid_meta_data
 
 transformer_dtype = power_grid_meta_data[DatasetType.input][ComponentType.transformer].dtype
 # Array for row based data
@@ -185,6 +191,15 @@ transformer_tap_pos = np.empty(shape=5, dtype=transformer_dtype[AttributeType.ta
 
 # direct string access is supported as well:
 # transformer = np.empty(shape=5, dtype=power_grid_meta_data[DatasetType.input][ComponentType.transformer].dtype)
+```
+
+For columnar data, you can also use `attribute_dtype` to retrieve the dtype for a specific attribute directly:
+
+```python
+from power_grid_model import AttributeType, ComponentType, DatasetType, attribute_dtype
+
+tap_pos_dtype = attribute_dtype(DatasetType.input, ComponentType.transformer, AttributeType.tap_pos)
+transformer_tap_pos = np.empty(shape=5, dtype=tap_pos_dtype)
 ```
 
 Furthermore, there is an even more convenient function `initialize_array` to directly create a `numpy` array with
@@ -202,4 +217,3 @@ from power_grid_model import AttributeType, ComponentType, DatasetType, initiali
 line_update = initialize_array(DatasetType.update, ComponentType.line, 5)
 line_update[AttributeType.id] = [1, 2, 3, 4, 5]
 line_update[AttributeType.from_status] = 1
-```
