@@ -82,6 +82,8 @@ Similar would be the case for `NodeInputId` and `std::vector<NodeNodeInputId>`.
 
 To recreate this in Python using NumPy arrays, we should create it with the correct dtype - as mentioned in
 [Structured Array](#structured-array) - for each attribute.
+You can use {py:function}`power_grid_model.attribute_dtype` to conveniently look up the correct dtype for a given
+attribute without manually inspecting the structured dtype.
 
 ```python
 node_id = np.empty(shape=2, dtype=node_dtype[AttributeType.id])
@@ -175,7 +177,7 @@ One can import the `power_grid_meta_data` to get all the predefined `numpy.dtype
 The code below creates an array which is compatible with transformer input dataset.
 
 ```python
-from power_grid_model import AttributeType. ComponentType, DatasetType, power_grid_meta_data
+from power_grid_model import AttributeType, ComponentType, DatasetType, power_grid_meta_data
 
 transformer_dtype = power_grid_meta_data[DatasetType.input][ComponentType.transformer].dtype
 # Array for row based data
@@ -185,6 +187,15 @@ transformer_tap_pos = np.empty(shape=5, dtype=transformer_dtype[AttributeType.ta
 
 # direct string access is supported as well:
 # transformer = np.empty(shape=5, dtype=power_grid_meta_data[DatasetType.input][ComponentType.transformer].dtype)
+```
+
+For columnar data, you can also use {py:function}`power_grid_model.attribute_dtype` to look up the dtype of a single
+attribute directly, without going through the structured dtype:
+
+```python
+from power_grid_model import AttributeType, ComponentType, DatasetType, attribute_dtype
+
+tap_pos_dtype = attribute_dtype(DatasetType.input, ComponentType.transformer, AttributeType.tap_pos)
 ```
 
 Furthermore, there is an even more convenient function `initialize_array` to directly create a `numpy` array with
@@ -202,4 +213,3 @@ from power_grid_model import AttributeType, ComponentType, DatasetType, initiali
 line_update = initialize_array(DatasetType.update, ComponentType.line, 5)
 line_update[AttributeType.id] = [1, 2, 3, 4, 5]
 line_update[AttributeType.from_status] = 1
-```

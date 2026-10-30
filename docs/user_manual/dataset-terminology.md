@@ -80,6 +80,11 @@ graph TD
 - **{py:class}`ComponentData <power_grid_model.data_types.ComponentData>`:** The data corresponding to the component.
   - **{py:class}`DataArray <power_grid_model.data_types.DataArray>`:** A data array can be a single or a batch array.
     It is a numpy structured array.
+    The dtype of each component array must match the dtype defined by Power Grid Model.
+    You can look up the expected dtype via
+    {py:data}`power_grid_model.power_grid_meta_data` (e.g.,
+    `power_grid_meta_data[DatasetType.input][ComponentType.node].dtype`) and discover the dtype of individual attributes
+    with {py:function}`power_grid_model.attribute_dtype`.
     - **{py:class}`SingleArray <power_grid_model.data_types.SingleArray>`:** A 1D numpy structured array corresponding
       to a single dataset.
     - **{py:class}`BatchArray <power_grid_model.data_types.BatchArray>`:** Multiple batches of data can be represented

@@ -193,8 +193,11 @@ Output:
 - Current flowing through branches and fault.
 
 ```{note}
-Short-circuit calculations are currently implemented in the phase (abc) domain and therefore require a grounded configurations in certain cases, similar to asymmetric power flow calculations.
-For details on how floating grids are treated in power-grid-model, please refer to[Floating grid handling](calulations.md#floating-grid-handling).
+Short-circuit calculations are currently implemented in the phase (abc) domain and therefore require grounded
+configurations in certain cases, similar to asymmetric power flow calculations.
+For details on how floating grids are treated in power-grid-model, please refer to
+[Floating grid handling](calculations.md#floating-grid-handling).
+```
 
 #### Common calculations
 
@@ -240,7 +243,9 @@ The option affects which attributes are required and how results are exposed.
   for all output variables.
 
 ```{note}
-In power-grid model, asymmetric calculations with certain configurations require the network to have a reference to ground. For details on how floating grids are treated in power-grid-model, please refer to [Floating grid handling](calulations.md#floating-grid-handling).
+In power-grid model, asymmetric calculations with certain configurations require the network to have a reference to
+ground. For details on how floating grids are treated in power-grid-model, please refer to
+[Floating grid handling](calculations.md#floating-grid-handling).
 ```
 
 ```{note}
