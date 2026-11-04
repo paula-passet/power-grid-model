@@ -395,15 +395,16 @@ uv sync --config-settings=cmake.build-type="Debug"
 If you have installed Visual Studio 2019/2022 (not the build tools), you can open the repo folder as a cmake project.
 The IDE should be able to automatically detect the Visual Studio cmake configuration file `CMakePresets.json`.
 Several configurations are pre-defined.
-It includes debug and release builds.
+It includes debug, release, and release-with-debug-info builds.
 
 * `msvc-debug`, displayed as `Debug (MSVC)`
-* `msvc-release`, displayed as `Release (MSVC)`.
+* `msvc-release`, displayed as `Release (MSVC)`
+* `msvc-relwithdebinfo`, displayed as `RelWithDebInfo (MSVC)`
 * `clang-cl-debug`, displayed as `Debug (Clang CL)`
 * `clang-cl-release`, displayed as `Release (Clang CL)`
+* `clang-cl-relwithdebinfo`, displayed as `RelWithDebInfo (Clang CL)`
 
 ```{note}
-- The `Release` presets are compiled with debug symbols.
 - The `Clang CL` presets require `clang-cl` to be installed, e.g. by installing `C++ Clang tools for Windows`.
 - When using an IDE that does not automatically set the toolchain environment using `vcvarsall.bat`, e.g. Visual Studio
   Code, make sure to open that IDE from a terminal that does so instead (e.g. `x64 Native Tools Command Prompt`).
