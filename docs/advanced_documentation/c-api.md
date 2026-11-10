@@ -56,6 +56,12 @@ error during the creation and the error message.
 If you are calling the C API in multiple threads, each thread should have its own handle object created by
 `PGM_create_handle`.
 
+```{note}
+Some functions do not require a handle pointer.
+For example, `PGM_version` returns a pointer to a zero-terminated string representing the library version
+and takes no arguments.
+```
+
 ## Calculation options
 
 To execute a power grid calculation you need to specify many options, e.g., maximum number of iterations, error

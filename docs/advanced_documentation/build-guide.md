@@ -403,7 +403,6 @@ It includes debug and release builds.
 * `clang-cl-release`, displayed as `Release (Clang CL)`
 
 ```{note}
-- The `Release` presets are compiled with debug symbols.
 - The `Clang CL` presets require `clang-cl` to be installed, e.g. by installing `C++ Clang tools for Windows`.
 - When using an IDE that does not automatically set the toolchain environment using `vcvarsall.bat`, e.g. Visual Studio
   Code, make sure to open that IDE from a terminal that does so instead (e.g. `x64 Native Tools Command Prompt`).

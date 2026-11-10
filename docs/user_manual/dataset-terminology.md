@@ -78,6 +78,10 @@ graph TD
     A batch dataset can contain sparse or dense data, depending on the component.
 
 - **{py:class}`ComponentData <power_grid_model.data_types.ComponentData>`:** The data corresponding to the component.
+  Component data can be provided in two formats: row-based (`DataArray`) or columnar (`ColumnarData`).
+  The row-based format uses numpy structured arrays where each element contains all attributes of a component.
+  The columnar format uses a dictionary of individual numpy arrays, one per attribute.
+  Both formats are accepted as input to the model.
   - **{py:class}`DataArray <power_grid_model.data_types.DataArray>`:** A data array can be a single or a batch array.
     It is a numpy structured array.
     - **{py:class}`SingleArray <power_grid_model.data_types.SingleArray>`:** A 1D numpy structured array corresponding
@@ -91,6 +95,8 @@ graph TD
         flattened over all batches.
   - **{py:class}`ColumnarData <power_grid_model.data_types.ColumnarData>`:** A dictionary of attributes as keys and
     individual numpy arrays as values.
+    This format is an alternative to the row-based `DataArray` format and can be more convenient when constructing
+    input data from separate per-attribute arrays (e.g., from pandas DataFrames or other columnar data sources).
     This format is described in more detail in
     [Native Data Interface](../advanced_documentation/native-data-interface.md#columnar-data-format).
     - **{py:class}`SingleColumnarData <power_grid_model.data_types.SingleColumnarData>`:** A dictionary of attributes as

@@ -39,9 +39,15 @@ graph LR
       sensor-->generic_power_sensor
         generic_power_sensor-->sym_power_sensor
         generic_power_sensor-->asym_power_sensor
+      sensor-->generic_current_sensor
+        generic_current_sensor-->sym_current_sensor
+        generic_current_sensor-->asym_current_sensor
+    base-->fault
+    base-->regulator
+      regulator-->transformer_tap_regulator
      
    classDef green fill:#9f6,stroke:#333,stroke-width:2px
-   class node,line,link,generic_branch,transformer,three_winding_transformer,source,shunt,sym_load,sym_gen,asym_load,asym_gen,sym_voltage_sensor,asym_voltage_sensor,sym_power_sensor,asym_power_sensor green
+   class node,line,link,generic_branch,transformer,three_winding_transformer,source,shunt,sym_load,sym_gen,asym_load,asym_gen,sym_voltage_sensor,asym_voltage_sensor,sym_power_sensor,asym_power_sensor,sym_current_sensor,asym_current_sensor,fault,transformer_tap_regulator green
 ```
 
 ```{note}
