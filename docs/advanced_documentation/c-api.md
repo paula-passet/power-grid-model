@@ -35,6 +35,12 @@ Since the C API is a dynamically linked library, the user is responsible for pla
 and making it available to their binaries, e.g. by adding its location to `PATH` or `RPATH`.
 ```
 
+```{note}
+The shared library SOVERSION uses only the major version number.
+If your system previously linked against the library using a full version string in the SO name,
+you may need to update your linking configuration accordingly.
+```
+
 ## Opaque struct/pointer
 
 As a common C API practice, we use [opaque struct/pointer](https://en.wikipedia.org/wiki/Opaque_pointer) in the API.
@@ -55,6 +61,17 @@ error during the creation and the error message.
 
 If you are calling the C API in multiple threads, each thread should have its own handle object created by
 `PGM_create_handle`.
+
+## Version
+
+You can query the version of the Power Grid Model library at runtime using the `PGM_version` function.
+It returns a pointer to a zero-terminated string representing the version.
+
+```c
+char const* version = PGM_version();
+```
+
+This function does not require a handle.
 
 ## Calculation options
 
