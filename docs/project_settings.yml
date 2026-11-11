@@ -1,0 +1,24 @@
+# docs/project_settings.yml — per-project settings that code applies
+#
+# Optional. Every key is optional; an unset key falls back to the pipeline default.
+# Unknown keys are rejected so a typo fails loudly.
+# Prose style rules and project context do NOT go here: they live in the Knowledge Base.
+
+# Repo folder where the .mmd diagram files are committed.
+diagrams_dir: docs/diagrams
+
+# Mermaid style per diagram role. The model only marks nodes as primary, secondary or accent;
+# the pipeline adds the matching classDef lines. Unset = the site's Mermaid theme.
+diagram_colours:
+  primary: fill:#69f,stroke:#333,stroke-width:2px
+  secondary: fill:#9f6,stroke:#333,stroke-width:2px
+  accent: fill:#ddd,stroke:#fff,stroke-width:2px
+
+# Build and configuration files. Stage 1 of the page selector shows more of their patches.
+# Glob patterns, matched against the full path or the bare file name. Unset = no file gets more room.
+build_files:
+  - CMakeLists.txt
+  - CMakePresets.json
+  - pyproject.toml
+  - "*.cmake"
+  - "*.cmake.in"
