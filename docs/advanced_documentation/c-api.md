@@ -35,6 +35,9 @@ Since the C API is a dynamically linked library, the user is responsible for pla
 and making it available to their binaries, e.g. by adding its location to `PATH` or `RPATH`.
 ```
 
+The SONAME of the C API shared library uses only the major version, not the full version string.
+Applications linked against an older build that used the full-version SONAME may need to be relinked.
+
 ## Opaque struct/pointer
 
 As a common C API practice, we use [opaque struct/pointer](https://en.wikipedia.org/wiki/Opaque_pointer) in the API.
@@ -55,6 +58,9 @@ error during the creation and the error message.
 
 If you are calling the C API in multiple threads, each thread should have its own handle object created by
 `PGM_create_handle`.
+
+One exception is `PGM_version`, which returns the version of the library as a zero-terminated string.
+It does not need a handle.
 
 ## Calculation options
 
