@@ -1,306 +1,225 @@
-# docs/pages.yml — catalog of pages the pipeline writes
+# DRAFT docs/pages.yml for Power Grid Model (PGM)
 #
-# Every page the pipeline is allowed to create or edit must be listed here.
-# Pages not listed are treated as untracked (soft flag, not blocked).
-# Pages listed as manual in automation.yml are excluded automatically.
+# Catalog of pages the pipeline writes. Copy to docs/pages.yml in the PGM repo
+# once reviewed. Only pages that are `edit` in automation.yml are listed:
+# `manual` pages (algorithms, API reference, contribution, index, notebooks)
+# never need a brief.
 #
 # Fields:
-#   path        — repo-relative path to the RST file
-#   title       — canonical page title (used to normalise the RST heading)
-#   page_type   — sub_page | section_index | standalone (default: sub_page)
-#   purpose     — what this page should explain (passed to LLM as generation brief)
-#   diagrams    — list of Mermaid diagram descriptions to auto-generate (optional)
+#   path        repo-relative path to the page file (Markdown or RST)
+#   title       canonical page title, identical to the page's top-level heading
+#   page_type   sub_page | standalone (default: sub_page)
+#   purpose     what this page explains; passed to the LLM as the generation brief
+#   diagrams    list of Mermaid diagram descriptions to generate (optional; only used when a page is
+#               created or regenerated; unused here)
 
 pages:
   # ── Repository README ──────────────────────────────────────────────────────
 
   - path: README.md
-    title: OpenSTEF
+    title: Power Grid Model
     page_type: standalone
     purpose: >
-      The front door of the project. Keep it short and scannable (under two
-      minutes to read). Required sections in order: (1) Logo at the top.
-      (2) Status badges (build, license, version). (3) What is OpenSTEF —
-      max 4 sentences, link to the OpenSTEF website. (4) Brief monorepo
-      overview — how the repository is structured. (5) How to Install —
-      copy-paste-ready pip commands. (6) Examples — link to the examples/
-      folder. (7) License — state license, link to LICENSE file. (8)
-      Contributing — link to .github contributing pages, do not duplicate
-      inline. (9) Citations — BibTeX entry or DOI link. (10) Contact —
-      link to support page. Design principle: link out, do not duplicate
-      content that lives in the docs.
+      The front door of the project. Keep it short and scannable. Sections in
+      order: (1) Title and status badges. (2) What power-grid-model is: a library
+      for steady-state distribution power system analysis, distributed for Python
+      and C, with a C++ core. List the supported calculations (power flow, state
+      estimation, short circuit). (3) Links to the documentation and to the sibling
+      repositories power-grid-model-io (data conversions) and power-grid-model-ds
+      (extended Python interface), plus the mailing list note. (4) Installation:
+      PyPI, Conda, and a link to the Build Guide for building from source.
+      (5) Examples: link to the examples, do not copy them. (6) Licenses,
+      Contributing, Citations and Contact. Design principle: link out to the
+      documentation, do not duplicate content that lives there. The License,
+      third-party licenses, Contributing, Citations and Contact sections are
+      static boilerplate: keep them unchanged.
 
-  # ── Getting Started ────────────────────────────────────────────────────────
+  # ── Getting started ────────────────────────────────────────────────────────
 
-  - path: docs/source/user_guide/getting_started/migration.rst
-    title: Migrating from OpenSTEF 3
-    page_type: sub_page
-    purpose: >
-      Help v3 users understand what changed and how to adapt their code.
-      v3 was a single `openstef` package with pipeline/task API plus `openstef-dbc`
-      for database access. v4 is a multi-package workspace that separates concerns.
-      Cover: (1) Why the split happened: core types vs models vs evaluation vs
-      orchestration are now independent. (2) Configuration: `PredictionJobDataClass`
-      became `ForecastingWorkflowConfig` (a full Pydantic model). Show a before/after
-      snippet. (3) Data: raw DataFrames became `TimeSeriesDataset`. (4) API: the
-      pipeline/task pattern became Workflows where users own I/O. (5) Database
-      connector: `openstef-dbc` has no v4 equivalent — users write their own data
-      integration. (6) Model type renames: 'xgb' → 'xgboost', 'lgb' → 'lgbm'.
-      (7) A migration checklist. Package mapping: openstef (core ML) → openstef-models,
-      openstef (data classes) → openstef-core, openstef (evaluation) → openstef-beam,
-      (new) → openstef-meta, openstef-dbc → no equivalent.
-    diagrams:
-      - >
-        Left-to-right graph showing v3 monolith splitting into v4 packages.
-        The v3 'openstef' box has arrows to openstef-models (Core ML), openstef-core
-        (Data Classes), openstef-beam (Evaluation), openstef-meta (New).
-        A separate 'openstef-dbc' box has an arrow to 'Your own I/O layer'
-        with a note 'v4 does not include a database connector'.
-
-  - path: docs/source/user_guide/getting_started/installation.rst
-    title: Installation
-    page_type: sub_page
-    purpose: >
-      Step-by-step installation guide generated from pyproject.toml.
-      pip commands for each package (openstef-core, openstef-models, openstef-beam,
-      openstef-meta), optional extras, and a quick-start snippet showing the
-      minimal working import. Note the meta-package openstef installs all sub-packages.
-
-  - path: docs/source/user_guide/getting_started/quick_start_tutorial.ipynb
+  - path: docs/quickstart.md
     title: Quick Start
     page_type: sub_page
     purpose: >
-      Train your first model and make a forecast in under 5 minutes.
-      This notebook is human-authored and managed manually — listed here
-      so neighbouring pages know it exists and can reference it without
-      duplicating its content.
+      A first working calculation in a few minutes. The page walks through one
+      small 10 kV network: a line connects two nodes, one node has a source, the
+      other has a symmetric load. Steps: input data, instantiating the model,
+      running a power flow calculation, validating the data, and batch data. Keep
+      the example complete and runnable against the current Python API. When the
+      API changes, update only the affected code and its explanation. Link to the
+      Graph Data Model, Calculations, Data Validator and Performance guide pages
+      instead of repeating their content.
 
-  - path: docs/source/user_guide/getting_started/foundation_model_forecasting_quickstart.ipynb
-    title: Foundation Model Quickstart
+  # ── User manual ────────────────────────────────────────────────────────────
+
+  - path: docs/user_manual/data-model.md
+    title: Component Type Hierarchy and Graph Data Model
     page_type: sub_page
     purpose: >
-      Forecast with a pretrained foundation model in a few minutes — no
-      per-target training required. This notebook is human-authored and
-      managed manually — listed here so neighbouring pages know it exists
-      and can reference it without duplicating its content.
+      Explain how the library represents a grid as a graph data model. Cover the
+      inheritance-like hierarchy of component types (a sub-type has all attributes
+      of its parent), the hierarchy diagram, symmetry of components and
+      calculations, and the reference direction convention. Keep the hierarchy
+      diagram in sync with the component types that exist in the library. Link to
+      the Components page for attribute details.
 
-  # ── Concepts ───────────────────────────────────────────────────────────────
-
-  - path: docs/source/user_guide/concepts/intro_to_energy_forecasting.rst
-    title: Intro to Energy Forecasting
+  - path: docs/user_manual/components.md
+    title: Components
     page_type: sub_page
     purpose: >
-      Context for the rest of the docs. What is short-term load forecasting and
-      why do grid operators need it? What input signals matter (load history, weather
-      forecasts, calendar features, market prices) and why each contributes. What
-      'horizon' means (15 minutes to 48 hours) and why accuracy degrades with lead time.
-      Practical difficulties: unpredictable consumers, aggregation level effects,
-      capacity changes. Keep short and focused. No diagram needed.
+      The reference for every component type and its attributes. Sections follow
+      the hierarchy: base, node, branch (line, link, transformer, generic branch,
+      asym line), branch3 (three-winding transformer), appliance (source, generic
+      load and generator, shunt), sensor (voltage, power, current), fault and
+      regulator (transformer tap regulator, voltage regulator). Each component
+      lists its type name and its input and output attributes with type, unit and
+      description, plus the equations that define derived values. Attribute names,
+      types and units must match the library exactly. When a release adds or
+      changes an attribute, edit only the affected component section and keep the
+      existing structure and wording elsewhere.
 
-  - path: docs/source/user_guide/concepts/models.rst
-    title: Models
+  - path: docs/user_manual/calculations.md
+    title: Calculations
     page_type: sub_page
     purpose: >
-      Overview of available models with selection guidance. Explain the containment
-      hierarchy: Forecaster (pure ML predictor) → ForecastingModel (adds pre/post
-      TransformPipelines) → CustomForecastingWorkflow (adds callbacks, model_id,
-      lifecycle) → Presets (opinionated factories via ForecastingWorkflowConfig).
-      Then a model-selection comparison table: Ensemble (preferred, tree+linear),
-      GBLinear (congestion management, extrapolation), LGBMLinear (balance),
-      XGBoost/LGBM (general-purpose), MedianForecaster (stable loads baseline),
-      FlatlinerForecaster and ConstantQuantileForecaster (fallback). All support
-      quantile forecasting. Link to API reference per model.
-    diagrams:
-      - >
-        Nested boxes showing containment (innermost to outermost): Forecaster
-        (pure ML predictor, e.g., XGBoostForecaster) is innermost.
-        ForecastingModel wraps Forecaster and adds preprocessing and postprocessing
-        TransformPipelines. CustomForecastingWorkflow wraps ForecastingModel and
-        adds callbacks, model_id, and lifecycle management. Outside, Presets
-        (ForecastingWorkflowConfig + create_forecasting_workflow factory) construct
-        a fully-wired Workflow from configuration. No data flow arrows — this is
-        purely about what-contains-what.
+      Explain what the library can calculate and how to choose. Cover the three
+      calculation types (power flow, state estimation, short circuit), regulated
+      power flow with automatic tap changing, symmetric versus asymmetric
+      calculations, floating grid handling, and the algorithm options for each
+      calculation type, including the quick decision guide for power flow
+      algorithms. Then batch calculations: batch datasets, dependent and full
+      batch updates, Cartesian product of batch datasets, and parallel computing.
+      Link to the algorithm pages for the mathematics and do not reproduce
+      derivations. Keep code examples consistent with the current Python API.
 
-  - path: docs/source/user_guide/concepts/metalearning.rst
-    title: Metalearning
+  - path: docs/user_manual/data-validator.md
+    title: Data Validator
     page_type: sub_page
     purpose: >
-      Explain metalearning as implemented in openstef-meta. Key insight: ensemble
-      models combine complementary strengths — tree-based models capture non-linear
-      patterns but cannot extrapolate; linear models can extrapolate but not learn
-      non-linear patterns. Architecture: EnsembleForecastingModel fans out to N
-      parallel per-forecaster pipelines. ForecastCombiner produces the final forecast.
-      Two strategies: WeightsCombiner (LGBM classifier per quantile, soft probability
-      weighting) and StackingCombiner (meta-regressor takes base predictions as input).
-      Link to ensemble_forecasting tutorial.
-    diagrams:
-      - >
-        EnsembleForecastingModel prediction flow: TimeSeriesDataset → shared
-        preprocessing TransformPipeline → fans out to N parallel paths
-        [per-forecaster preprocessing → Forecaster] for each base model →
-        merge into EnsembleForecastDataset → ForecastCombiner →
-        final ForecastDataset.
-      - >
-        Two formula-style diagrams side by side. WeightsCombiner: base predictions →
-        LGBM classifier per quantile → predict_proba → soft probability weights →
-        weighted average = final forecast. StackingCombiner: base predictions per
-        quantile (as input features) → meta-regressor → direct final quantile
-        prediction.
+      Explain the input and update data validator. Input data is not validated
+      automatically for performance reasons, and many data errors give invalid
+      results without raising an exception, so users should validate before
+      constructing a model. Cover the validation error objects and their readable
+      messages, the manual validation functions, the assertion helpers and the
+      utilities, all available from power_grid_model.validation. Link to the
+      Validation Examples notebook.
 
-  - path: docs/source/user_guide/concepts/beam.rst
-    title: BEAM
+  - path: docs/user_manual/dataset-terminology.md
+    title: Dataset Terminology
     page_type: sub_page
     purpose: >
-      Explain BEAM (Backtesting, Evaluation, Analysis, and Metrics). BenchmarkPipeline
-      orchestrates sequential stages per target: (A) BacktestPipeline steps through
-      data via BacktestEventGenerator, using BacktestForecasterMixin with
-      RestrictedHorizonVersionedTimeSeries to prevent data leakage. Output:
-      predictions as TimeSeriesDataset. (B) EvaluationPipeline segments by
-      available_at x lead_time x time_windows, computes configurable metrics.
-      Output: EvaluationReport. (C) AnalysisPipeline produces HTML visualisations.
-      BenchmarkStorage persists outputs. Value: fair, reproducible model comparison.
-      Link to backtesting guide for practical usage.
-    diagrams:
-      - >
-        BenchmarkPipeline as outer orchestrator containing the sequential per-target
-        flow: TargetProvider feeds data → ForecasterFactory creates BacktestForecasterMixin
-        → BacktestPipeline produces predictions (TimeSeriesDataset) →
-        EvaluationPipeline produces EvaluationReport → AnalysisPipeline produces
-        visualisations (AnalysisOutput). BenchmarkStorage persists after each stage.
+      Define the vocabulary used for the library's data structures: dataset,
+      component and attribute. Cover the data structure overview, numpy array
+      dimensions, dataset types, terminology related to data structures, and the
+      attributes of components. Keep definitions consistent with the Native Data
+      Interface and Components pages. Link to the Python API reference for the
+      detailed data types.
 
-  - path: docs/source/user_guide/concepts/component_splitting.rst
-    title: Component Splitting
+  - path: docs/user_manual/performance-guide.md
+    title: Guidelines for performance enhancement
     page_type: sub_page
     purpose: >
-      Explain what component splitting is and why operators need it. A grid operator
-      sees aggregated load but needs to understand the constituents (solar, wind,
-      base industrial, residential). Component splitting decomposes an aggregated
-      forecast into constituents using known profiles or ratios. Critical: this does
-      NOT improve forecast accuracy — the forecast is made on aggregated load first,
-      then decomposed. Use cases: grid planning, congestion analysis, understanding
-      generation mix, regulatory reporting.
+      System-level guidance for getting the best performance on large grids,
+      batch calculations with many scenarios, and many changes per scenario. Cover
+      data validity, data format (input and update volume, output volume, database
+      integration), batch calculations (topology caching, batch datasets,
+      multi-dimensional batches), parallel computing and matrix prefactorization.
+      Algorithm-level choices belong on the Calculations page, so link there
+      instead of repeating them.
 
-  - path: docs/source/user_guide/concepts/foundation_models.rst
-    title: Foundation Models
+  - path: docs/user_manual/model-validation.md
+    title: Model validation
     page_type: sub_page
     purpose: >
-      Zero-shot pretrained forecasting on an ONNX runtime — no per-target
-      training required. Explain what a foundation model is in the OpenSTEF
-      context, how the ONNX runtime is used for inference, what fields control model 
-      selection and execution providers (CPU, CUDA, CoreML), and how batching works 
-      across multiple targets. Cover the tradeoff vs trained models: faster 
-      deployment, no training data needed, but less adaptation to local patterns. 
+      Document how the library's results are validated, using the test cases in the
+      tests/data folder. Cover the minimal test cases per component validated
+      against pandapower, the distribution and transmission network cases, the
+      Vision validation case, the short circuit calculation cases, validation
+      against other libraries, and how to create a test case. Describe only
+      validation that exists in the repository. Never add validation claims that
+      the test data does not support.
 
-  # ── Guides ─────────────────────────────────────────────────────────────────
-
-  - path: docs/source/user_guide/guides/forecasting.rst
-    title: Forecasting
+  - path: docs/user_manual/serialization.md
+    title: Serialization
     page_type: sub_page
     purpose: >
-      The central how-to-forecast page — architecture and design decisions, not
-      runnable code (tutorials cover that). What OpenSTEF needs: datetime-indexed
-      data with a 'load' column, weather features, declared sample_interval.
-      What it returns: ForecastDataset with point forecast and optional quantiles.
-      Recommend Presets for production, Workflow for research. Data requirements:
-      expected columns, time zones, sample_interval. Fit/predict lifecycle at
-      Workflow level: fit (preprocessing → forecaster.fit → callbacks),
-      predict (preprocessing → forecaster.predict → postprocessing → callbacks).
-      Model reuse: if a recent model exists in storage, workflow skips retraining.
-      Link to forecasting_quickstart and custom_pipeline tutorials.
-    diagrams:
-      - >
-        Two parallel flows. Fit path: Historical TimeSeriesDataset →
-        preprocessing TransformPipeline (validation → feature engineering →
-        standardisation) → ForecastInputDataset → Forecaster.fit() → trained model
-        → callbacks (MLflow storage). Predict path: New TimeSeriesDataset → same
-        preprocessing → ForecastInputDataset → Forecaster.predict() → raw
-        ForecastDataset → postprocessing TransformPipeline (quantile sorting,
-        confidence intervals) → final ForecastDataset → callbacks (logging).
-        Workflow wraps both paths.
+      Explain how datasets are serialized and deserialized. Describe the two
+      supported formats, JSON and msgpack, with a specification of each. Keep the
+      format specifications and their examples exactly consistent with the
+      library's implementation. Link to the Python API reference and the C API
+      reference for the serialization tools.
 
-  - path: docs/source/user_guide/guides/feature_engineering_tutorial.ipynb
-    title: Feature Engineering
+  # ── Advanced documentation ─────────────────────────────────────────────────
+
+  - path: docs/advanced_documentation/build-guide.md
+    title: Build Guide
     page_type: sub_page
     purpose: >
-      Create, select, and manage features for your models.
+      How to build the library from source. Cover the builds in the repository
+      (the Python package with a C++ extension as calculation core, and the CMake
+      project with the header-only C++ core and the dynamic library with a stable
+      C API), build requirements (architecture support, compiler support, build
+      dependencies), building the Python package, user and developer CMake builds,
+      the build script for Linux and macOS, example setups for Ubuntu, Windows and
+      macOS, and running the package tests. Commands must be copy-paste ready.
+      When compiler or dependency requirements change, update them to match the
+      project's build configuration.
 
-  - path: docs/source/user_guide/guides/datasets_tutorial.ipynb
-    title: Datasets
+  - path: docs/advanced_documentation/c-api.md
+    title: Use Power Grid Model through C API
     page_type: sub_page
     purpose: >
-      Prepare and validate input data for training and prediction.
+      How to use the library from a non-Python application (C, C++, Java, C#, and
+      others). Explain that the C API consists of header files and a dynamic
+      library, link to the Build Guide, and cover finding and linking the package,
+      the opaque struct and pointer, the handle, calculation options, buffers and
+      attributes (component buffers and attribute buffers) and dataset views.
+      Names and signatures must match the headers in the C API include folder.
 
-  - path: docs/source/user_guide/guides/probabilistic_forecasting.rst
-    title: Probabilistic Forecasting
+  - path: docs/advanced_documentation/core-design.md
+    title: Design of the Power Grid Model core
     page_type: sub_page
     purpose: >
-      Why: a point forecast is not enough — grid operators need uncertainty ranges
-      for reserve planning, congestion management, and market bidding. How OpenSTEF
-      provides this: all models support quantile forecasting via the quantiles field
-      on ForecastingWorkflowConfig. XGBoost uses pinball loss, GBLinear uses
-      reg:quantileerror, LGBM uses MultiQuantileRegressor. Isotonic calibration:
-      IsotonicQuantileCalibrator is a postprocessing Transform that maps predicted
-      values to observed quantile levels using sklearn IsotonicRegression, restoring
-      proper coverage while enforcing monotonicity. Link to quantile_calibration
-      tutorial and IsotonicQuantileCalibrator API reference.
+      Describe the design of the C++ core. The core is a header-only C++ interface
+      library wrapped by a dynamic C API library, built around the MainModel, which
+      consists of an API part, a dispatch part, the grid model and the calculation
+      logic. Cover the calculation logic and data flow between modules and the more
+      detailed core design. Keep module names consistent with the source code.
 
-  - path: docs/source/user_guide/guides/reliability_fallback.rst
-    title: Reliability and Fallback
+  - path: docs/advanced_documentation/high-level-design.md
+    title: High-level design
     page_type: sub_page
     purpose: >
-      Operational reality: data feeds fail — meters flatline, weather APIs go down,
-      data arrives late. The system must detect and respond gracefully. Validation
-      transforms: FlatlineChecker (configurable via flatliner_threshold,
-      detect_non_zero_flatliner), CompletenessChecker (completeness_threshold).
-      Fallback strategies: FlatlinerForecaster (constant prediction on flatline),
-      ConstantQuantileForecaster (minimal forecast on low data availability,
-      configured via completeness_threshold_target_constant_quantile). All configured
-      in ForecastingWorkflowConfig; the preset factory switches automatically based
-      on data quality checks.
+      Explain the high-level architecture: a dynamic or shared library with a strict
+      system boundary between the user interface and the core implementation.
+      Cover the layers of abstraction, the existing library interfaces, and how to
+      create, host and contribute a custom library or interface on top of the C API.
 
-  - path: docs/source/user_guide/guides/backtesting.ipynb
-    title: Backtesting
+  - path: docs/advanced_documentation/native-data-interface.md
+    title: Native Data Interface
     page_type: sub_page
     purpose: >
-      Practical guide: how to evaluate your model on historical data before trusting
-      it in production. Configure BacktestForecasterMixin (RestrictedHorizonVersionedTimeSeries
-      prevents lookahead). Run BacktestPipeline stepping through history via
-      BacktestEventGenerator (BacktestConfig with predict_interval and train_interval).
-      Then EvaluationPipeline segments by available_at x lead_time x time_windows.
-      Interpreting results: per-window vs aggregated metrics, what good looks like
-      for energy forecasting. Link to BEAM concept page and backtesting_quickstart
-      tutorial.
+      Explain the data format used to exchange data between Python and the C++
+      core: a dictionary of numpy structured arrays, keyed by component type, where
+      each array element is one physical component. Cover the structured (row
+      based) array, the columnar data format, creating a dataset, basic data types
+      including enumerations, and the meta-data helper module. Keep code examples
+      runnable against the current Python API.
 
-  - path: docs/source/user_guide/guides/deployment.rst
-    title: Deployment
+  - path: docs/advanced_documentation/python-wrapper-design.md
+    title: Design of the Python Wrapper Package
     page_type: sub_page
     purpose: >
-      How the library works in different deployment contexts without prescribing a
-      single approach. OpenSTEF is a pure ML library with no built-in scheduling,
-      orchestration, or data storage. Three common strategies: (1) Scheduled notebooks
-      (training + forecasting notebooks with data integration, run on Sagemaker /
-      Databricks). (2) DAG-based orchestration (Airflow, Dagster, Prefect — separate
-      data integration, training, prediction stages). (3) Queued execution (per-location
-      tasks dispatched to workers, optimised for large-scale operations). Data sources:
-      link Open-Meteo for weather (free, global), KNMI for NL-specific weather. Model
-      storage: MLflow model registry via MLFlowStorageCallback handles versioning and
-      reuse. Storage is pluggable — users implement custom callbacks. OpenSTEF is
-      modular: custom callbacks, storage backends, and integration layers are
-      encouraged.
+      Show the structure of the power_grid_model Python package through its class
+      diagram and package diagram. Only classes that have connections to other
+      classes appear in the class diagram. Keep both diagrams in sync with the
+      current package structure. The page is intentionally short.
 
-  - path: docs/source/user_guide/guides/foundation_model_forecasting.ipynb
-    title: Foundation Model Forecasting
+  - path: docs/advanced_documentation/terminology.md
+    title: Advanced terminology
     page_type: sub_page
     purpose: >
-      Checkpoints, execution providers for your hardware, batching, and
-      backtesting with a pretrained foundation model. 
-
-  - path: docs/source/user_guide/logging.rst
-    title: Logging
-    page_type: sub_page
-    purpose: >
-      How to configure logging for OpenSTEF applications. Cover the default
-      NullHandler behaviour, the logger naming hierarchy and what each level
-      emits, common configuration patterns for development and production
-      (including structured JSON output), and troubleshooting tips for missing
-      or excessive output.
+      A glossary that eases communication between the electrical engineering,
+      mathematics and programming fields involved in the project. It currently
+      holds programming terminology such as bug, bad input, edge case and
+      undefined behavior. Keep existing definitions. Add or change a term only
+      when a release introduces new vocabulary that the other documentation uses.

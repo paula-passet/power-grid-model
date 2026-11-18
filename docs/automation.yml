@@ -4,14 +4,15 @@
 # Rules are evaluated in order; the LAST matching rule wins.
 #
 # Modes:
-#   manual     — never touch (human-owned pages: index, api, contribute)
+#   manual     — never touch (human-owned pages: index, api, contribution, algorithms)
 #   edit       — patch on relevant changes (existing content-rich pages)
 #   regenerate — always rebuild from scratch (requires a brief in pages.yml)
+#
+# Besides the rules, the file has two optional blocks: release_triggers and diagrams_settings (see the end of the file).
+# Unknown keys in it are rejected so a typo fails loudly.
 
 rules:
-  # Default: all RST and Markdown files are editable
-  - pattern: "**/*.rst"
-    mode: edit
+  # Default: all Markdown files
   - pattern: "**/*.md"
     mode: edit
 
@@ -23,30 +24,42 @@ rules:
   - pattern: "**/*.ipynb"
     mode: manual
 
-  # API reference is auto-generated separately — never touch
-  - pattern: "docs/source/api/**"
+  # API reference is generated from code (autodoc and Doxygen) — never touch
+  - pattern: "docs/api_reference/**"
     mode: manual
 
-  # Contribute section is human-owned — never touch
-  - pattern: "docs/source/contribute/**"
+  # Contribution section is human-owned — never touch
+  - pattern: "docs/contribution/**"
     mode: manual
 
-  # Top-level index is human-owned — never touch
-  - pattern: "docs/source/index.rst"
+  # Algorithm pages contain derivations and equations — never touch
+  - pattern: "docs/algorithms/**"
     mode: manual
 
-  # Sphinx templates are internal build files — never touch
-  - pattern: "docs/source/_templates/**"
+  # Top-level index holds the install instructions and toctree — never touch
+  - pattern: "docs/index.md"
     mode: manual
 
-  # Section index stubs are navigation scaffolding — human-owned
-  - pattern: "docs/source/**/index.rst"
+  # Container setup describes contributor tooling, not the library — never touch
+  - pattern: "docs/working_with_containers/**"
     mode: manual
 
-  # Project meta pages (license, maintainers, committee, etc.) are static — never touch
-  - pattern: "docs/source/project/**"
-    mode: manual
+# Diagram settings that code applies. Every key is optional.
+#   dir      repo folder where the .mmd diagram files are committed
+#   colours  Mermaid style per diagram role. The model only marks nodes as primary,
+#            secondary or accent; the pipeline adds the matching classDef lines.
+#            Unset = the site's Mermaid theme.
+diagrams_settings:
+  dir: docs/diagrams
+  colours:
+    primary: fill:#69f,stroke:#333,stroke-width:2px
+    secondary: fill:#9f6,stroke:#333,stroke-width:2px
+    accent: fill:#ddd,stroke:#fff,stroke-width:2px
 
-  # # Installation guide is always regenerated from pyproject.toml
-  # - pattern: "docs/source/user_guide/getting_started/installation.rst"
-  #   mode: regenerate
+# Which releases start the pipeline. Optional: unset = every release runs.
+#   pr_labels  a release runs only if at least one pull request in it has one of these labels
+#              (case-insensitive). A missing file or a GitHub error never blocks a release.
+release_triggers:
+  pr_labels:
+    - feature
+    - improvement
