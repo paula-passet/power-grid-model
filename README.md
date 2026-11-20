@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Contributors to the Power Grid Model project <powergridm
 SPDX-License-Identifier: MPL-2.0
 -->
 
-[![Power Grid Model logo](https://raw.githubusercontent.com/PowerGridModel/.github/main/artwork/svg/color.svg)](#) <!-- markdownlint-disable-line first-line-h1 line-length no-empty-links -->
+[![Power Grid Model logo](https://raw.githubusercontent.com/PowerGridModel/.github/main/artwork/svg/color.svg)](#)
 
 [![PyPI version](https://badge.fury.io/py/power-grid-model.svg?no-cache)](https://badge.fury.io/py/power-grid-model)
 [![PyPI Downloads](https://static.pepy.tech/badge/power-grid-model)](https://pepy.tech/project/power-grid-model)
@@ -38,6 +38,10 @@ Currently, it supports the following calculations:
 * Power Flow
 * State Estimation
 * Short Circuit
+
+An experimental command-line interface (CLI) is also provided, allowing users to run calculations directly from the
+command line using serialized input/output data files, without writing Python code.
+See the [Quick Start](docs/quickstart.md) for an introduction.
 
 See the [power-grid-model documentation](https://power-grid-model.readthedocs.io/en/stable/) for more information.
 For various conversions to the power-grid-model, refer to the
