@@ -15,6 +15,10 @@ In this repository there are three builds:
   targets:
   * A dynamic library (`.dll` on Windows, `.so` on Linux, or `.dylib` on macOS) with a stable pure C API/ABI which can
     be used by any application (enabled by default).
+  * A CLI backend shared library (`power_grid_model_cli_backend`) exposing a public C API for embedding CLI
+    functionality (enabled by default).
+  * A CLI executable (`power-grid-model`) for running power grid calculations from the command line (enabled by
+    default).
   * An install target that installs the package containing the dynamic library (enabled by default).
   * Native C++ unit tests.
   * C API tests.
@@ -23,6 +27,12 @@ In this repository there are three builds:
 * A separate example [CMake](https://cmake.org/) project with a small C++ program that shows how to find and use the
   installable package.
 
+```{note}
+If you just want to develop the _Python_ side of `power-grid-model`, you can use the
+[provided development container](./devcontainer-setup.md).
+It automatically sets up the entire environment so you can start developing immediately.
+```
+
 ```{contents}
 ```
 
@@ -30,7 +40,7 @@ In this repository there are three builds:
 
 To build the library from source, you need to first prepare the compiler toolchains and the build dependencies.
 In this section a list of general requirements are given.
-After this section there are examples of setup in Linux (Ubuntu 24.04), Windows 11, and macOS (Tahoe).
+After this section there are examples of setup in Linux (Ubuntu 26.04), Windows 11, and macOS (Tahoe).
 
 ### Architecture Support
 
@@ -48,13 +58,13 @@ Below is a list of tested compilers:
 
 #### Linux
 
-* gcc >= 14.0:
-  * Version 14.x tested using the version in the `manylinux_2_28` container.
-  * Version 14.x tested using the `musllinux` build with custom compiler.
-  * Version 14.x tested in CI.
-* Clang >= 18.0:
-  * Version 18.x tested in CI.
-  * Version 18.x tested in CI with code quality checks.
+* gcc >= 16.0:
+  * Version 16.x tested using the version in the `manylinux_2_28` container.
+  * Version 16.x tested using the `musllinux` build with custom compiler.
+  * Version 16.x tested in CI.
+* Clang >= 22.0:
+  * Version 22.x tested in CI.
+  * Version 22.x tested in CI with code quality checks.
 
 ```{Admonition} Additional information
 Wheel builds for Linux are done inside containers using `cibuildwheel`:
@@ -66,10 +76,10 @@ These are handled automatically in CI. For local development, use your system's 
 
 #### Windows
 
-* MSVC >= 19.0:
-  * Latest release tested in CI (e.g. Visual Studio 2022, IDE or build tools).
-* Clang CL >= 19.0:
-  * Latest release tested in CI (e.g. Visual Studio 2022, IDE or build tools).
+* MSVC >= 19.5.*:
+  * Latest release tested in CI (e.g. Visual Studio 2026, IDE or build tools).
+* Clang CL >= 20.1.8:
+  * Latest release tested in CI (e.g. Visual Studio 2026, IDE or build tools).
 
 #### macOS
 
@@ -77,7 +87,9 @@ These are handled automatically in CI. For local development, use your system's 
   * Latest XCode release tested in CI.
 
 ```{note}
-Once your compiler of choice is installed, you need to define the environment variables `CC` and `CXX` to specify the compiler. For example `export CC=clang-18` and `export CXX=clang++-18` to select the `clang` compiler in Ubuntu.
+Once your compiler of choice is installed, you need to define the environment variables `CC` and `CXX` to specify the
+compiler.
+For example `export CC=clang-22` and `export CXX=clang++-22` to select the `clang` compiler in Ubuntu.
 ```
 
 ### Build System for CMake Project
@@ -91,16 +103,21 @@ This repository uses [CMake](https://cmake.org/) (version 3.23 or later) as its 
 The table below shows the C++ build dependencies.
 
 ```{note}
-The C++ dependencies below are **build-time only**. When building the Python package from source (via `uv sync`), they are automatically downloaded and used during the build — you do not need to install them manually. Manual installation is only required for standalone CMake builds.
+The C++ dependencies below are **build-time only**. When building the Python package from source (via `uv sync`), they
+are automatically downloaded and used during the build — you do not need to install them manually.
+Manual installation is only required for standalone CMake builds.
 ```
 
+<!-- pyml disable line-length-->
 | Library name                                                        | Requirements to build Python package | Requirements to build CMake project         | Remark      | License                                                                                                      |
 | ------------------------------------------------------------------- | ------------------------------------ | ------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------ |
 | [boost](https://www.boost.org/)                                     | Installed automatically              | CMake needs to be able find `boost`         | header-only | [Boost Software License - Version 1.0](https://www.boost.org/LICENSE_1_0.txt)                                |
 | [eigen3](https://eigen.tuxfamily.org/)                              | Installed automatically              | CMake needs to be able find `eigen3`        | header-only | [Mozilla Public License, version 2.0](https://www.mozilla.org/en-US/MPL/2.0/)                                |
 | [nlohmann-json](https://github.com/nlohmann/json)                   | Installed automatically              | CMake needs to be able find `nlohmann_json` | header-only | [MIT](https://github.com/nlohmann/json/blob/develop/LICENSE.MIT)                                             |
 | [msgpack-cxx](https://github.com/msgpack/msgpack-c/tree/cpp_master) | Installed automatically              | CMake needs to be able find `msgpack-cxx`   | header-only | [Boost Software License - Version 1.0](https://github.com/msgpack/msgpack-c/blob/cpp_master/LICENSE_1_0.txt) |
+| [CLI11](https://github.com/CLIUtils/CLI11)                          | Installed automatically              | CMake needs to be able find `CLI11`         | header-only | [BSD-3](https://github.com/CLIUtils/CLI11/blob/main/LICENSE)                                                 |
 | [doctest](https://github.com/doctest/doctest)                       | None                                 | CMake needs to be able find `doctest`       | header-only | [MIT](https://github.com/doctest/doctest/blob/master/LICENSE.txt)                                            |
+<!-- pyml enable line-length-->
 
 To install the C++ dependencies for a CMake build, use your platform's package manager of choice.
 In the platform-specific examples below, we will give some suggestions.
@@ -114,6 +131,7 @@ Set `CMAKE_PREFIX_PATH` to the installation prefix of your package manager so CM
 
 The table below shows the Python dependencies.
 
+<!-- pyml disable line-length-->
 | Library name                                                           | Remark                 | License                                                                                    |
 |------------------------------------------------------------------------|------------------------|--------------------------------------------------------------------------------------------|
 | [numpy](https://numpy.org/)                                            | Runtime dependency     | [BSD-3](https://github.com/numpy/numpy/blob/main/LICENSE.txt)                              |
@@ -122,6 +140,7 @@ The table below shows the Python dependencies.
 | [pytest-cov](https://github.com/pytest-dev/pytest-cov)                 | Development dependency | [MIT](https://github.com/pytest-dev/pytest-cov/blob/master/LICENSE)                        |
 | [msgpack-python](https://github.com/msgpack/msgpack-python)            | Development dependency | [Apache License, Version 2.0](https://github.com/msgpack/msgpack-python/blob/main/COPYING) |
 | [uv](https://github.com/astral-sh/uv)                                  | Development dependency | [Apache License, Version 2.0](https://github.com/astral-sh/uv/blob/main/LICENSE-APACHE)    |
+<!-- pyml enable line-length-->
 
 ## Build Python Package
 
@@ -146,6 +165,7 @@ deserialization.
 
 ```python
 from power_grid_model.utils import self_test
+
 self_test()
 ```
 
@@ -193,13 +213,16 @@ Supported presets for your development platform can be listed using `cmake --lis
 In the developer build the following build targets (directories) are enabled:
 
 * `power_grid_model_c`: a dynamic library (`.so` on Linux, `.dylib` on macOS, `.dll` on Windows) with stable pure
-C API/ABI which can be used by any
-  application.
-* `tests/cpp_unit_tests_*`: the different unit test targets for the C++ core using the `doctest` framework.
+  C API/ABI which can be used by any application.
+* `power_grid_model_cli_backend`: a shared library exposing a public C API (`PGM_cli_main`) that can be linked by
+  external programs to embed CLI functionality.
+* `power-grid-model`: a CLI executable for running power grid calculations from the command line.
+* `tests/cpp_unit_tests_*`: (including subdirectories) the different unit test targets for the C++ core using the
+  `doctest` framework.
 * `tests/cpp_validation_tests`: the validation test target using the `doctest` framework.
 * `tests/native_api_tests`: the C API test target using the `doctest` framework.
 * `tests/benchmark_cpp`: the C++ benchmark target for performance measure.
-* `power_grid_model_c_example`: an example C program to call the dynamic library.
+* `examples/c_api`: example C programs to call the dynamic library.
 
 On Linux/macOS, the presets will use command `clang`/`clang++` or `gcc`/`g++` to find the relevant `clang` or `gcc`
 compiler.
@@ -230,45 +253,45 @@ Usage: ./build.sh -p <preset> [-c] [-e] [-i] [-t]
 
 To list the available presets, run `./build.sh -h`.
 
-## Example Setup for Ubuntu 24.04 (in WSL or physical/virtual machine)
+## Example Setup for Ubuntu 26.04 (in WSL or physical/virtual machine)
 
-In this section an example is given for setup in Ubuntu 24.04.
+In this section an example is given for setup in Ubuntu 26.04.
 You can use this example in Windows Subsystem for Linux (WSL), or in a physical/virtual machine.
 
-### Ubuntu Software Packages
+While you can use `apt`, setup via [Homebrew](https://brew.sh) has proved to be much simpler.
+In addition, the recommended way to get the [C++ packages](#c) and `uv` is via [Homebrew](https://brew.sh).
 
-Install the minimum required packages:
+### Set-up Homebrew
+
+Follow the setup guidelines in [Homebrew](https://brew.sh).
+For optimal user experience on Linux, also consider installing the
+[requirements](https://docs.brew.sh/Homebrew-on-Linux#requirements) as well.
+
+At the time of writing, the set-up is done as follows:
 
 ```shell
-sudo apt update && sudo apt -y upgrade
-sudo apt install -y build-essential gcc g++ clang-18 make ninja-build pkg-config
+sudo apt update && sudo apt upgrade                     # make sure you're up to date
+sudo apt install build-essential gcc g++ clang-22 procps curl file git # install initial dependencies
 ```
 
-The following packages are optional depending on your use case:
+Then install Homebrew using the setup recommendations in [Homebrew](https://brew.sh).
 
-```shell
-sudo apt install -y gcovr lcov # For coverage reports
-sudo apt install -y gdb # For debugging
-sudo apt install -y wget curl zip unzip tar git # General use tools
-```
-
-### C++ Dependencies for CMake
+### C++ Dependencies + Build Requirements
 
 The recommended way to get the [C++ packages](#c) and `uv` is via [Homebrew](https://brew.sh):
 
 ```shell
-brew install boost eigen nlohmann-json msgpack-cxx doctest cmake uv
+brew install \
+    gdb gcovr lcov lld cmake ninja \
+    boost eigen nlohmann-json msgpack-cxx cli11 doctest uv
 ```
 
-### Environment variables
-
-Append the following lines into the file `${HOME}/.bashrc`.
+Append the following lines into the file `${HOME}/.bashrc` (required for `scikit-build` for the Python installation):
 
 ```shell
-export CXX=clang++-18            # or g++-14
-export CC=clang-18               # or gcc-14
-export CMAKE_PREFIX_PATH=/home/linuxbrew/.linuxbrew  # only needed for CMake builds
-export LLVM_COV=llvm-cov-18      # only if you want to use one of the llvm features
+export CXX=clang++  # or g++ or g++-16 or ...
+export CC=clang     # or gcc or gcc-16 or ...
+export LLVM_COV=llvm-cov-22      # only if you want to use one of the llvm features
 export CLANG_TIDY=clang-tidy-18  # only if you want to use one of the clang-tidy presets
 ```
 
@@ -304,9 +327,9 @@ As a quick start, from the root of the repository:
 You need to install the MSVC compiler.
 You can either install the whole Visual Studio IDE or just the build tools.
 
-* [Visual Studio Build Tools](https://aka.ms/vs/17/release/vs_BuildTools.exe) (free)
+* [Visual Studio Build Tools](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2026) (free)
   * Select C++ build tools
-* Full [Visual Studio](https://visualstudio.microsoft.com/vs/) (All three versions are suitable.
+* Full [Visual Studio](https://visualstudio.microsoft.com/downloads/) (All three versions are suitable.
   Check the license!)
   * Select Desktop Development with C++
     * [Optional] Select `C++ Clang tools for Windows`
@@ -342,16 +365,18 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
 The recommended way to get [C++ packages](#c) is via `conda`. Open a miniforge console.
 
 ```shell
-conda create --yes -p C:\conda_envs\cpp_pkgs -c conda-forge libboost-headers eigen nlohmann_json msgpack-cxx doctest
+conda create --yes -p C:\conda_envs\cpp_pkgs -c conda-forge libboost-headers eigen nlohmann_json msgpack-cxx cli11 doctest
 ```
 
 ### Environment variables
 
 Set `CMAKE_PREFIX_PATH` so CMake can locate the C++ libraries. In PowerShell:
 
+<!-- pyml disable commands-show-output-->
 ```powershell
 $env:CMAKE_PREFIX_PATH = C:\conda_envs\cpp_pkgs\Library
 ```
+<!-- pyml enable commands-show-output-->
 
 To make it persistent across sessions:
 
@@ -418,7 +443,7 @@ In this section, an example is given for setup in macOS Tahoe and the project's 
 The recommended way to get the [C++ packages](#c) and `uv` is via [Homebrew](https://brew.sh):
 
 ```shell
-brew install ninja cmake boost eigen nlohmann-json msgpack-cxx doctest uv
+brew install ninja cmake boost eigen nlohmann-json msgpack-cxx cli11 doctest uv
 ```
 
 ### Environment variables
@@ -523,7 +548,7 @@ in `docs/_build/html` directory.
 cd docs/doxygen
 doxygen
 cd ..
-sphinx-build -b html . _build/html
+uv run sphinx-build -b html . _build/html
 ```
 
 ```{note}
