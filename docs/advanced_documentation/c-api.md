@@ -33,6 +33,7 @@ An {{ "[example project]({}/tests/package_tests/CMakeLists.txt)".format(gh_link_
 ```{note}
 Since the C API is a dynamically linked library, the user is responsible for placing the library in the right location,
 and making it available to their binaries, e.g. by adding its location to `PATH` or `RPATH`.
+The shared library SOVERSION corresponds to the major version number of the library.
 ```
 
 ## Opaque struct/pointer
@@ -55,6 +56,9 @@ error during the creation and the error message.
 
 If you are calling the C API in multiple threads, each thread should have its own handle object created by
 `PGM_create_handle`.
+
+Additionally, you can use `PGM_version` to query the version of the Power Grid Model library at runtime.
+This function does not require a handle and returns a pointer to a zero-terminated version string.
 
 ## Calculation options
 
