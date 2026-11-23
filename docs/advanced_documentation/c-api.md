@@ -56,6 +56,13 @@ error during the creation and the error message.
 If you are calling the C API in multiple threads, each thread should have its own handle object created by
 `PGM_create_handle`.
 
+The function `PGM_version` is an exception: it does not take a handle.
+It returns a pointer to a zero-terminated string with the version of the Power Grid Model library.
+
+```c
+char const* version = PGM_version();
+```
+
 ## Calculation options
 
 To execute a power grid calculation you need to specify many options, e.g., maximum number of iterations, error
