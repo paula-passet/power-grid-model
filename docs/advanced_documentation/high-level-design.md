@@ -34,12 +34,14 @@ abstraction.
 
 The following library interfaces are currently included in the power-grid-model.
 
-| Interface type | Status       | Layer              | Explanation                                                     | Supported by                                        |
-| -------------- | ------------ | ------------------ | --------------------------------------------------------------- | --------------------------------------------------- |
-| C API          | Stable       | Raw interface      | Shared object / DLL that contains the core implementation       | All programming languages with dynamic load support |
-| C headers      | Stable       | Exposition-only    | Exposition-only library using dynamic linking                   | C and C++                                           |
-| C++ headers    | Experimental | Wrapper            | Handles memory management and basic error handling              | C++                                                 |
-| Python library | Stable       | Feature-rich layer | Library with useful functions, conversions and extensive checks | Python                                              |
+| Interface type      | Status       | Layer              | Explanation                                                                  | Supported by                                        |
+| ------------------- | ------------ | ------------------ | ---------------------------------------------------------------------------- | --------------------------------------------------- |
+| C API               | Stable       | Raw interface      | Shared object / DLL that contains the core implementation                    | All programming languages with dynamic load support |
+| C headers           | Stable       | Exposition-only    | Exposition-only library using dynamic linking                                | C and C++                                           |
+| C++ headers         | Experimental | Wrapper            | Handles memory management and basic error handling                           | C++                                                 |
+| Python library      | Stable       | Feature-rich layer | Library with useful functions, conversions and extensive checks              | Python                                              |
+| CLI backend library | Stable       | Raw interface      | C shared library (`power_grid_model_cli_backend`) exposing `PGM_cli_main`   | All programming languages with dynamic load support |
+| CLI executable      | Stable       | Feature-rich layer | `power-grid-model` command-line executable for running calculations directly | Terminal / shell users                              |
 
 Note that the Python library in turn also follows the pattern of a feature-rich library that uses a module-internal
 wrapper layer core module, that wraps the exposition-only core module, that exposes the raw interface.
@@ -61,6 +63,7 @@ flowchart TD
         c_user(["C user"]):::user_node
         cpp_user(["C++ user"]):::user_node
         python_user(["Python user"]):::user_node
+        cli_user(["CLI user"]):::user_node
     end
 
     dynamic_loading{ }:::inclusion_method
@@ -68,6 +71,7 @@ flowchart TD
 
     subgraph Raw interface
         power_grid_model_c_dll("power_grid_model_c<br>(shared library)"):::public_interface
+        power_grid_model_cli_backend("power_grid_model_cli_backend<br>(shared library)"):::public_interface
     end
 
     subgraph Exposition
@@ -82,6 +86,7 @@ flowchart TD
 
     subgraph Feature-rich library
         power_grid_model_python("power_grid_model<br>(Python library)"):::public_interface
+        power_grid_model_cli("power-grid-model<br>(CLI executable)"):::public_interface
     end
 
     any_language_user --> dynamic_loading
@@ -92,6 +97,7 @@ flowchart TD
     c_includes -->|links +<br>includes| power_grid_model_c -->|dynamic linking| power_grid_model_c_dll
     cpp_user -->|experimental<br>links +<br>includes| power_grid_model_cpp -->|links +<br>includes| power_grid_model_c
     python_user -->|import| power_grid_model_python -->|internal import| power_grid_model_core_python -->|internal import| power_grid_core_python -->|"CDLL<br>(dynamic loading)"| power_grid_model_c_dll
+    cli_user -->|runs| power_grid_model_cli -->|calls| power_grid_model_cli_backend -->|links| power_grid_model_c_dll
 ```
 
 ## Creating a custom library or interface
